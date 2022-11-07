@@ -5,7 +5,7 @@
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/cfb3/tcss-450-web-service-starter"
+    "url": "https://github.com/ryan-montoya/rmonto6-tcss450-project-auth.git"
   },
   "scripts": {
     "test": "index.js"
