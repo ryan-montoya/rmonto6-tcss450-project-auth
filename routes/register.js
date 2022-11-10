@@ -55,14 +55,43 @@ router.post('/', (request, response, next) => {
     const last = request.body.last
     const username = isStringProvided(request.body.username) ?  request.body.username : request.body.email
     const email = request.body.email
-    const password = request.body.password
+    const password = request.body.password 
+
+
+    //password validation 
+    output = true; 
+    if(password.length < 7){
+        output= false;
+    }
+    if(!password.match(".*\\d.*")){
+        output=false;
+    }
+    if(!password.match(".*[A-Z].*")){
+        output=false;
+    }
+    if(!password.match(".*[a-z].*")){
+        output=false;
+    }
+    if(!password.match(".*[!@#$%^&*()].*")){
+        output=false;
+    }
+
+
+
+
+
     //Verify that the caller supplied all the parameters
-    //In js, empty strings or null values evaluate to false
+    //In js, empty strings or null values evaluate to false 
+    
+
+
+
+
     if(isStringProvided(first) 
         && isStringProvided(last) 
         && isStringProvided(username) 
         && isStringProvided(email) 
-        && isStringProvided(password)) {
+        && isStringProvided(password) && output) {
         
         //We're using placeholders ($1, $2, $3) in the SQL query string to avoid SQL Injection
         //If you want to read more: https://stackoverflow.com/a/8265319
