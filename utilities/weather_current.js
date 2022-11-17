@@ -14,7 +14,10 @@ router.post("/", (request, response) => {
     .then(data =>{
 
         const payload = {
-            temp: data.data[0].temp
+            temp: data.data[0].temp,
+            clouds: data.data[0].clouds,
+            aqi: data.data[0].aqi,
+            weather: data.data[0].weather.description
         }
         
         response.send({
