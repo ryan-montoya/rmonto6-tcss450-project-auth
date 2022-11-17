@@ -7,6 +7,7 @@ var router = express.Router()
 
 router.post("/", (request, response) => {
     const city = request.body.city;
+    
     fetch('https://api.weatherbit.io/v2.0/forecast/daily?city='+city+'&key=0262b79849e84a35866dc2600904ecd3')
         .then(response =>{
             return response.json();
