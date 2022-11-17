@@ -25,6 +25,7 @@ app.use('/auth', require('./routes/signin.js'))
 app.use('/auth', require('./routes/register.js'))
 
 app.use('/weather',require('./utilities/weather.js'))
+app.use('/weather_current',require('./utilities/weather_current.js'))
 
 
 /*
