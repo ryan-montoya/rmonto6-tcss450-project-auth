@@ -7,8 +7,12 @@ var router = express.Router()
 
 router.post("/", (request, response) => {
     const city = request.body.city;
-    
-    fetch('https://api.weatherbit.io/v2.0/forecast/daily?city='+city+'&key=0262b79849e84a35866dc2600904ecd3')
+    fetch('https://rmonto6-tcss450-project-auth.herokuapp.com/api_uses')
+    .then(response =>{
+        return response.json();
+    })
+    .then(data =>{
+    fetch('https://api.weatherbit.io/v2.0/forecast/daily?city='+city+'&key=' + data.message)
         .then(response =>{
             return response.json();
         })
@@ -66,6 +70,7 @@ router.post("/", (request, response) => {
                 message: payload
             })
     })
+})
 })
 
 

@@ -20,6 +20,7 @@ const api_keys = {
 
 router.get("/", (request, response) => {
         keys = JSON.stringify(api_keys.keys[0])
+        position = 0
         split = keys.split('\"')
         fetch('https://api.weatherbit.io/v2.0/subscription/usage?key='+ split[3])
     .then(response =>{
@@ -31,7 +32,7 @@ router.get("/", (request, response) => {
 
         response.send({
             //req.query is a reference to arguments a
-            message: split[3]
+            message: position
         })
 })
     

@@ -4,10 +4,31 @@ const express = require('express')
 //retrieve the router object from express
 var router = express.Router()
 
-
+const api_keys = {
+    keys : [{
+        key1: "0262b79849e84a35866dc2600904ecd3"
+    },
+    {
+        key2: "188f548df07c4b31a4f9ba8663aaeb42"
+    },
+    {
+        key3: "09684b49b5344c0a87cd1961aa60b05c"
+    },
+    {
+        key4: "61a3155487884405a26387bc46edd87f"
+    }
+]}
 router.post("/", (request, response) => {
     const city = request.body.city;
-    fetch('https://api.weatherbit.io/v2.0/current?city='+city+'&key=0262b79849e84a35866dc2600904ecd3')
+
+    fetch('https://rmonto6-tcss450-project-auth.herokuapp.com/api_uses')
+    .then(response =>{
+        return response.json();
+    })
+    .then(data =>{
+        keys = JSON.stringify(api_keys.keys[data.message])
+        split = keys.split('\"')
+    fetch('https://api.weatherbit.io/v2.0/current?city='+city+'&key=' + split[3])
     .then(response =>{
         return response.json();
     })
@@ -24,6 +45,7 @@ router.post("/", (request, response) => {
             //req.query is a reference to arguments a
             message: payload
         })
+})
 })
 })
 
