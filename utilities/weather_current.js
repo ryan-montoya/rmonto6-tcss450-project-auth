@@ -28,23 +28,19 @@ router.post("/", (request, response) => {
     .then(data =>{
         keys = JSON.stringify(api_keys.keys[data.message])
         split = keys.split('\"')
-    fetch('https://api.weatherbit.io/v2.0/current?city='+city+'&key=' + split[3])
+    fetch('https://api.weatherbit.io/v2.0/forecast/daily?city='+city+'&key=' + split[3])
     .then(response =>{
         return response.json();
     })
     .then(data =>{
-
-        const payload = {
-            temp: data.data[0].temp,
-            clouds: data.data[0].clouds,
-            aqi: data.data[0].aqi,
-            weather: data.data[0].weather.description
-        }
-        
-        response.send({
-            //req.query is a reference to arguments a
-            message: payload
-        })
+        console.log(data.data[0].valid_date)
+    fetch('http://api.weatherbit.io/v2.0/history/hourly?city='+city + '&start_date=' + data.data[0].valid_date + "&end_date=" + data.data[0].valid_date +'&key=' + split[3])
+    .then(response =>{
+        return response.json();
+    })
+    .then(data =>{
+        console.log(data)
+})
 })
 })
 })
