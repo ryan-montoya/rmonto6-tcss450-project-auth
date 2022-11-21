@@ -34,7 +34,7 @@ router.post("/", (request, response) => {
     })
     .then(data =>{
         console.log(data.data[0].valid_date)
-    fetch('http://api.weatherbit.io/v2.0/history/hourly?city='+city + '&start_date=' + data.data[0].valid_date + "&end_date=" + data.data[0].valid_date +'&key=' + split[3])
+    fetch('http://api.weatherbit.io/v2.0/history/hourly?city='+city + '&start_date=' + data.data[0].valid_date + "&end_date=" + data.data[1].valid_date +'&key=' + split[3])
     .then(response =>{
         return response.json();
     })
