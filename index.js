@@ -31,7 +31,7 @@ app.use('/api_uses',require('./utilities/api_uses.js'))
 app.use('/phish', middleware.checkToken, require('./routes/phish.js'))
 app.use('/messages', middleware.checkToken, require('./routes/messages.js'))
 app.use('/chats', middleware.checkToken, require('./routes/chats.js')) 
-app.use('/auth', middleware.checkToken, require('./routes/pushyregister.js'))
+app.use('/pushy', middleware.checkToken, require('./routes/pushyregister.js'))
 
 
 
