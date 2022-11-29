@@ -1,41 +1,6 @@
-//express is the framework we're going to use to handle requests
-const express = require('express')
 
-//retrieve the router object from express
-var router = express.Router()
-let sendEmail = (sender, receiver, subject, message) => {
-    //research nodemailer for sending email from node.
-    // https://nodemailer.com/about/
-    // https://www.w3schools.com/nodejs/nodejs_email.asp
-    //create a burner gmail account 
-    //make sure you add the password to the environmental variables
-    //similar to the DATABASE_URL and PHISH_DOT_NET_KEY (later section of the lab)
+const sendEmail = (sender, receiver, subject, message) => {
 
-    //fake sending an email for now. Post a message to logs.
-var nodemailer = require('nodemailer');
-
-var transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: 'Smalltalktcss@gmail.com',
-    pass: 'P4a$$w0rd'
-  }
-});
-
-var mailOptions = {
-  from: sender,
-  to: receiver,
-  subject: subject,
-  text: message
-};
-
-transporter.sendMail(mailOptions, function(error, info){
-  if (error) {
-    console.log(error);
-  } else {
-    console.log('Email sent: ' + info.response);
-  }
-}); 
     console.log("*********************************************************")
     console.log('To: ' + receiver)
     console.log('From: ' + sender)
@@ -44,14 +9,41 @@ transporter.sendMail(mailOptions, function(error, info){
     console.log(message)
     console.log("*********************************************************")
 
-}
-router.post("/", (request, response) => {
-    sender = request.body.sender
-    receiver = request.body.receiver
-    subject = request.body.subject
-    message = request.body.message
-    sendEmail = (sender, receiver, subject, message)
-});
-module.exports = { 
-    router
-}
+    const nodeMailer = require('nodemailer')
+    const adminEmail = "address adminEmail"
+    const adminPassword = "address admin password" ;
+    const mailHost = 'smtp.gmail.com'
+    const mailPort = 587
+
+    const transporter = nodeMailer.createTransport({
+        host: mailHost,
+        port: mailPort,
+        secure: false, // if you port 465 true, leave false for another port.
+        auth: {
+            user: adminEmail,
+            pass: adminPassword
+        }
+    });
+    const options = {
+        from: sender, // address to send
+        to: receiver, // ho got mail
+        subject: subject, // subjecct of mail
+        text: message // Phần nội dung mail mình sẽ dùng html thay vì thuần văn bản thông thường.
+    }
+    // hàm transporter.sendMail() này sẽ trả về cho chúng ta một Promise
+    // transporter.sendMail()
+    // return transporter.sendMail(options)
+};
+sendEmail(options);
+
+
+// module.exports = {
+//     sendEmail
+// }
+
+
+
+// const add =(a,b) => {
+//     return a+b
+// }
+// console.log(add(4,6))
