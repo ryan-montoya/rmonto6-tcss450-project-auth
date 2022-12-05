@@ -9,6 +9,13 @@ const REFRESH_TOKEN = '1//04IX233oN_Lb4CgYIARAAGAQSNwF-L9IrXzBQdkRw-BlrwzTqtLdB5
 const oAuth2Clien  = new google.auth.OAuth2(CLIENT_ID,CLIENT_SECRET, REDIRECT_URI)
 oAuth2Clien.setCredentials({ refresh_token: REFRESH_TOKEN })
 
+const FROM = 'Group7_TCSS450_admin @ <emailfortrialcoding@gmail.com>'
+const TOEMAIL = 'nickungdung@gmail.com'
+const SUBJECT = 'Example to send email through API gmail'
+const BODY = ' information need to send in email '
+
+
+
 async function sendMail(){
 
     try{
@@ -27,11 +34,11 @@ async function sendMail(){
         })
     
         const mailOptions = {
-            from: 'Group7_TCSS450_admin @ <emailfortrialcoding@gmail.com>', 
-            to: 'nickungdung@gmail.com',
-            subject: 'Exaple to send email through API gmail',
-            text: 'text for send emaul, can be string',
-            html: '<h1> Hello form gmail email using API </h1>',
+            from: FROM,
+            to: TOEMAIL,
+            subject: SUBJECT,
+            text: BODY,
+        //    html: '<h1> Hello form gmail email using API </h1>',
         };
     
         const result = await transport.sendMail(mailOptions);
