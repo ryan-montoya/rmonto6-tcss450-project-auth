@@ -49,7 +49,7 @@ async function sendMail(){
     }
 } 
 
-sendMail()
+/*sendMail()
     .then((result) => console.log('email send ....', result))
-    .catch( (error) => console.log(error.message) );
+    .catch( (error) => console.log(error.message) );*/
 
