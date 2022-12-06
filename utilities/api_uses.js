@@ -19,8 +19,8 @@ const api_keys = {
 ]}
 
 router.get("/", (request, response) => {
-        keys = JSON.stringify(api_keys.keys[2])
-        position = 2
+        keys = JSON.stringify(api_keys.keys[4])
+        position = 4
         split = keys.split('\"')
         fetch('https://api.weatherbit.io/v2.0/subscription/usage?key='+ split[3])
     .then(response =>{
