@@ -28,7 +28,7 @@ router.post("/", (request, response) => {
     .then(data =>{
         keys = JSON.stringify(api_keys.keys[data.message])
         split = keys.split('\"')
-    fetch('https://api.weatherbit.io/v2.0/forecast/current?lat='+lat+'&lon='+long+'&key=' + split[3])
+    fetch('https://api.weatherbit.io/v2.0/current?lat='+lat+'&lon='+long+'&key=' + split[3])
         .then(response =>{
             return response.json();
         })
