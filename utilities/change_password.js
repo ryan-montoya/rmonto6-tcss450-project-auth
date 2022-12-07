@@ -1,24 +1,29 @@
 //express is the framework we're going to use to handle requests
-const { response } = require('express')
-const { request } = require('express')
-const express = require('express')
+// const { response } = require('express')
+// const { request } = require('express')
+// const express = require('express')
+// const pool = require('../utilities').pool
 
-//Access the connection to Heroku Database
-const pool = require('../utilities').pool
+// const validation = require('../utilities').validation
 
-const validation = require('../utilities').validation
-let isStringProvided = validation.isStringProvided
+// let isStringProvided = validation.isStringProvided
+// const jwt = require('jsonwebtoken')
+// const router = express.Router()
+// const generateHash = require('../utilities').generateHash
+// const generateSalt = require('../utilities').generateSalt
 
-const generateHash = require('../utilities').generateHash
+const express = require("express");
 
-const router = express.Router()
+const jwt = require("jsonwebtoken");
 
-//Pull in the JWT module along with out a secret key
-const jwt = require('jsonwebtoken')
+const router = express.Router();
+const { generateHash, generateSalt } = require("../utilities");
+const { isValidPassword } = require("../utilities/validationUtils");
+const pool = require("../utilities").pool;
 
-const config = {
-    secret: process.env.JSON_WEB_TOKEN
-}
+// const config = {
+//     secret: process.env.JSON_WEB_TOKEN
+// }
 
 /**
  * @api {get} /auth Request to sign a user in the system
@@ -48,91 +53,93 @@ const config = {
  * @apiError (400: Invalid Credentials) {String} message "Credentials did not match"
  * 
  */ 
-router.get('/', (request, response, next) => {
-    if (isStringProvided(request.headers.authorization) && isStringProvided(request.)) {
-        next()
-    } else {
-        response.status(400).json({ message: 'Missing Authorization Header' })
-    }
-}, (request, response, next) => {
-    // obtain auth credentials from HTTP Header
-    const base64Credentials =  request.headers.authorization.split(' ')[1]
-    
-    const credentials = Buffer.from(base64Credentials, 'base64').toString('ascii')
+ router.post("/", (request, response, next) => {
+    const jwtBody = request.body.jwt;
+    const jwtDecoded = jwt.decode(jwtBody);
+    const memberid = jwtDecoded.memberid;
+    const oldPassword = request.body.oldPassword;
+    const newPassword = request.body.newPassword;
 
-    const [email, password] = credentials.split(':')
-
-    if (isStringProvided(email) && isStringProvided(password)) {
-        request.auth = { 
-            "email" : email,
-            "password" : password
-        }
-        next()
-    } else {
+    //Verify that the user supplied a valid new password
+    if (!isValidPassword(newPassword)) {
         response.status(400).send({
-            message: "Malformed Authorization Header"
-        })
+            message: "Password does not meet requirements",
+        });
+        return;
     }
-}, (request, response) => {
-    const theQuery = `SELECT saltedhash, salt, Credentials.memberid FROM Credentials
-                      INNER JOIN Members ON
-                      Credentials.memberid=Members.memberid 
-                      WHERE Members.email=$1`
-    const values = [request.auth.email]
-    pool.query(theQuery, values)
-        .then(result => { 
+
+    // Gets users salted hash, salt, and memberid
+    let getSaltQuery =
+        "SELECT CREDENTIALS.SALTEDHASH, CREDENTIALS.SALT FROM CREDENTIALS WHERE CREDENTIALS.MEMBERID = $1";
+
+    const values = [memberid];
+    pool.query(getSaltQuery, values)
+        .then((result) => {
+            // If user email doesnt exist, return error
             if (result.rowCount == 0) {
                 response.status(404).send({
-                    message: 'User not found' 
-                })
-                return
+                    message: "User not found",
+                });
+                return;
             }
 
-            //Retrieve the salt used to create the salted-hash provided from the DB
-            let salt = result.rows[0].salt
-            
-            //Retrieve the salted-hash password provided from the DB
-            let storedSaltedHash = result.rows[0].saltedhash 
+            // If the user does exist, get salt and salted hash to
+            // compare with old password that was sent
+            if (result.rowCount == 1) {
+                const salt = result.rows[0].salt;
+                const salted_hash = generateHash(oldPassword, salt);
 
-            //Generate a hash based on the stored salt and the provided password
-            let providedSaltedHash = generateHash(request.auth.password, salt)
-
-            //Did our salted hash match their salted hash?
-            if (storedSaltedHash === providedSaltedHash ) {
-                //credentials match. get a new JWT
-                let token = jwt.sign(
-                    {
-                        "email": request.auth.email,
-                        "memberid": result.rows[0].memberid
-                    },
-                    config.secret,
-                    { 
-                        expiresIn: '14 days' // expires in 14 days
-                    }
-                )
-                //package and send the results
-                response.json({
-                    success: true,
-                    message: 'Authentication successful!',
-                    token: token
-                })
-            } else {
-                //credentials dod not match
-                response.status(400).send({
-                    message: 'Credentials did not match' 
-                })
+                // If the old password is correct, then the password can
+                // be updated in the database with the new password
+                if (salted_hash == result.rows[0].saltedhash) {
+                    const newSalt = generateSalt(32);
+                    const newSaltedHash = generateHash(newPassword, newSalt);
+                    let insertNewPassQuery =
+                        "UPDATE CREDENTIALS SET SALT = $1, SALTEDHASH = $2 WHERE CREDENTIALS.MEMBERID = $3";
+                    const newValues = [newSalt, newSaltedHash, memberid];
+                    pool.query(insertNewPassQuery, newValues)
+                        .then((result) => {
+                            // Succesfullu updated password
+                            if (result.rowCount == 1) {
+                                response.status(200).send({
+                                    message: "Password updated",
+                                });
+                                return;
+                            }
+                            // We should never reach this
+                            // If multiple accounts got their password updated
+                            // or none at all
+                            else {
+                                response.status(400).send({
+                                    message: "Error has occured",
+                                });
+                                return;
+                            }
+                        })
+                        // If the query somehow fails
+                        .catch((error) => {
+                            response.status(500).send({
+                                message: "Database query failed #1",
+                            });
+                            return;
+                        });
+                }
+                // Invalid old password input by user
+                else {
+                    response.status(400).send({
+                        message: "Invalid old password",
+                    });
+                    return;
+                }
             }
         })
-        .catch((err) => {
-            //log the error
-            console.log("Error on SELECT************************")
-            console.log(err)
-            console.log("************************")
-            console.log(err.stack)
-            response.status(400).send({
-                message: err.detail
-            })
-        })
-})
+        // Failed to ger users salted hash
+        .catch((error) => {
+            response.status(500).send({
+                message: "Database query failed #2",
+            });
+            return;
+        });
+});
 
-module.exports = router
+module.exports = router;
