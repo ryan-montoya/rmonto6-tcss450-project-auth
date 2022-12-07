@@ -33,7 +33,6 @@ router.post("/", (request, response) => {
             return response.json();
         })
         .then(data =>{
-
             const payload = {
                 "days" : [
                     {
