@@ -12,13 +12,18 @@
 // const generateHash = require('../utilities').generateHash
 // const generateSalt = require('../utilities').generateSalt
 
+/*
+@author: Duy VU
+*/
 const express = require("express");
 
 const jwt = require("jsonwebtoken");
 
 const router = express.Router();
+
 const { generateHash, generateSalt } = require("../utilities");
 const { isValidPassword } = require("../utilities/validationUtils");
+
 const pool = require("../utilities").pool;
 
 // const config = {
@@ -95,8 +100,8 @@ const pool = require("../utilities").pool;
                     const newSalt = generateSalt(32);
                     const newSaltedHash = generateHash(newPassword, newSalt);
                     let insertNewPassQuery =
-                        "UPDATE CREDENTIALS SET SALT = $1, SALTEDHASH = $2 WHERE CREDENTIALS.MEMBERID = $3";
-                    const newValues = [newSalt, newSaltedHash, memberid];
+                        "UPDATE CREDENTIALS SET SALTEDHASH = $1, SALT = $2 WHERE CREDENTIALS.MEMBERID = $3";
+                    const newValues = [newSaltedHash ,newSalt,  memberid];
                     pool.query(insertNewPassQuery, newValues)
                         .then((result) => {
                             // Succesfullu updated password
