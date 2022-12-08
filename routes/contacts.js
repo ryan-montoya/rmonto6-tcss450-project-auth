@@ -167,4 +167,33 @@ router.post("/", (request, response, next) => {
         })
 })
 
+router.get("/", (request, response, next) => {
+    //validate on missing or invalid (type) parameters
+    //validate chat id exists
+    const username_A = request.body.username_A
+
+    let query = `SELECT A.Username as "1st user", B.Username as "2nd User", verified
+    FROM contacts, members A, members B
+    WHERE (MemberID_A = A.MemberID AND MemberID_B = B.MemberID
+    AND A.Username = $1) or (MemberID_A = A.MemberID AND MemberID_B = B.MemberID
+    AND B.Username = $1)`    
+    let values = [username_A]
+
+    pool.query(query, values)
+        .then(result => {
+            if (result.rowCount > 0) {
+                response.send({
+                    success: true,
+                    rows: result.rows
+
+                })
+            }
+        }).catch(error => {
+            response.status(400).send({
+                message: "SQL Error",
+                error: error
+            })
+        })
+})
+
 module.exports = router
