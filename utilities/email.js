@@ -1,49 +1,55 @@
+const nodemailer = require('nodemailer')
+const { google } = require('googleapis')
 
-const sendEmail = (sender, receiver, subject, message) => {
+const CLIENT_ID = '254939617338-9o8oqdobsabdd5bkedakd31mnvdjagel.apps.googleusercontent.com'
+const CLIENT_SECRET = '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'
+const REDIRECT_URI = 'https://developers.google.com/oauthplayground'
+const REFRESH_TOKEN = '1//04IX233oN_Lb4CgYIARAAGAQSNwF-L9IrXzBQdkRw-BlrwzTqtLdB5Qx8slnkHiOXFb3YNgTGuJs8eLVE-n_1_UuUCIjov2VeO9U'
 
-    console.log("*********************************************************")
-    console.log('To: ' + receiver)
-    console.log('From: ' + sender)
-    console.log('Subject: ' + subject)
-    console.log("_________________________________________________________")
-    console.log(message)
-    console.log("*********************************************************")
+const oAuth2Clien  = new google.auth.OAuth2(CLIENT_ID,CLIENT_SECRET, REDIRECT_URI)
+oAuth2Clien.setCredentials({ refresh_token: REFRESH_TOKEN })
 
-    const nodeMailer = require('nodemailer')
-    const adminEmail = "address adminEmail"
-    const adminPassword = "address admin password" ;
-    const mailHost = 'smtp.gmail.com'
-    const mailPort = 587
+const FROM = 'Group7_TCSS450_admin @ <emailfortrialcoding@gmail.com>'
+const TOEMAIL = 'nickungdung@gmail.com'
+const SUBJECT = 'Example to send email through API gmail'
+const BODY = ' information need to send in email '
 
-    const transporter = nodeMailer.createTransport({
-        host: mailHost,
-        port: mailPort,
-        secure: false, // if you port 465 true, leave false for another port.
-        auth: {
-            user: adminEmail,
-            pass: adminPassword
-        }
-    });
-    const options = {
-        from: sender, // address to send
-        to: receiver, // ho got mail
-        subject: subject, // subjecct of mail
-        text: message // Phần nội dung mail mình sẽ dùng html thay vì thuần văn bản thông thường.
+
+
+async function sendMail(){
+
+    try{
+        const accessToken = await oAuth2Clien.getAccessToken()
+
+        const transport = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                type: 'OAuth2',
+                user: 'emailfortrialcoding@gmail.com',
+                clientId: CLIENT_ID,
+                clientSecret: CLIENT_SECRET,
+                refreshToken: REFRESH_TOKEN,
+                accessToken: accessToken
+            }
+        })
+    
+        const mailOptions = {
+            from: FROM,
+            to: TOEMAIL,
+            subject: SUBJECT,
+            text: BODY,
+        //    html: '<h1> Hello form gmail email using API </h1>',
+        };
+    
+        const result = await transport.sendMail(mailOptions);
+        return result;
+
+    } catch(error){
+        return error
     }
-    // hàm transporter.sendMail() này sẽ trả về cho chúng ta một Promise
-    // transporter.sendMail()
-    // return transporter.sendMail(options)
-};
-sendEmail(options);
+} 
 
+sendMail()
+    .then((result) => console.log('email send ....', result))
+    .catch( (error) => console.log(error.message) );
 
-// module.exports = {
-//     sendEmail
-// }
-
-
-
-// const add =(a,b) => {
-//     return a+b
-// }
-// console.log(add(4,6))
