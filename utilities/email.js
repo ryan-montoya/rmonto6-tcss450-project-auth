@@ -1,55 +1,57 @@
-const nodemailer = require('nodemailer')
-const { google } = require('googleapis')
+//express is the framework we're going to use to handle requests
+const express = require('express')
 
-const CLIENT_ID = '254939617338-9o8oqdobsabdd5bkedakd31mnvdjagel.apps.googleusercontent.com'
-const CLIENT_SECRET = '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'
-const REDIRECT_URI = 'https://developers.google.com/oauthplayground'
-const REFRESH_TOKEN = '1//04IX233oN_Lb4CgYIARAAGAQSNwF-L9IrXzBQdkRw-BlrwzTqtLdB5Qx8slnkHiOXFb3YNgTGuJs8eLVE-n_1_UuUCIjov2VeO9U'
+//retrieve the router object from express
+var router = express.Router()
+let sendEmail = (sender, receiver, subject, message) => {
+    //research nodemailer for sending email from node.
+    // https://nodemailer.com/about/
+    // https://www.w3schools.com/nodejs/nodejs_email.asp
+    //create a burner gmail account 
+    //make sure you add the password to the environmental variables
+    //similar to the DATABASE_URL and PHISH_DOT_NETKEY (later section of the lab)
 
-const oAuth2Clien  = new google.auth.OAuth2(CLIENT_ID,CLIENT_SECRET, REDIRECT_URI)
-oAuth2Clien.setCredentials({ refresh_token: REFRESH_TOKEN })
+    //fake sending an email for now. Post a message to logs.
+var nodemailer = require('nodemailer');
 
-const FROM = 'Group7_TCSS450_admin @ <emailfortrialcoding@gmail.com>'
-const TOEMAIL = 'nickungdung@gmail.com'
-const SUBJECT = 'Example to send email through API gmail'
-const BODY = ' information need to send in email '
+var transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'Smalltalktcss@gmail.com',
+    pass: 'P4$$w0rd'
+  }
+});
 
+var mailOptions = {
+  from: sender,
+  to: receiver,
+  subject: subject,
+  text: message
+};
 
+transporter.sendMail(mailOptions, function(error, info){
+  if (error) {
+    console.log(error);
+  } else {
+    console.log('Email sent: ' + info.response);
+  }
+}); 
+    console.log("*")
+    console.log('To: ' + receiver)
+    console.log('From: ' + sender)
+    console.log('Subject: ' + subject)
+    console.log("__")
+    console.log(message)
+    console.log("*")
 
-async function sendMail(){
-
-    try{
-        const accessToken = await oAuth2Clien.getAccessToken()
-
-        const transport = nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-                type: 'OAuth2',
-                user: 'emailfortrialcoding@gmail.com',
-                clientId: CLIENT_ID,
-                clientSecret: CLIENT_SECRET,
-                refreshToken: REFRESH_TOKEN,
-                accessToken: accessToken
-            }
-        })
-    
-        const mailOptions = {
-            from: FROM,
-            to: TOEMAIL,
-            subject: SUBJECT,
-            text: BODY,
-        //    html: '<h1> Hello form gmail email using API </h1>',
-        };
-    
-        const result = await transport.sendMail(mailOptions);
-        return result;
-
-    } catch(error){
-        return error
-    }
-} 
-
-sendMail()
-    .then((result) => console.log('email send ....', result))
-    .catch( (error) => console.log(error.message) );
-
+}
+router.post("/", (request, response) => {
+    sender = request.body.sender
+    receiver = request.body.receiver
+    subject = request.body.subject
+    message = request.body.message
+    sendEmail = (sender, receiver, subject, message)
+});
+module.exports = { 
+    router
+}
