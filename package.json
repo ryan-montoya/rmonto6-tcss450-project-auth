@@ -20,6 +20,7 @@
   "dependencies": {
     "express": "^4.17.1",
     "form-data": "^3.0.0",
+    "googleapis": "^109.0.1",
     "jsonwebtoken": "^8.5.1",
     "mysql": "^2.18.1",
     "node-jq": "^2.3.4",
