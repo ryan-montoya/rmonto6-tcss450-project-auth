@@ -19,7 +19,8 @@ const api_keys = {
 ]}
 
 router.post("/", (request, response) => {
-    const city = request.body.city;
+    const lat = request.body.lat;
+    const long = request.body.long;
     fetch('https://rmonto6-tcss450-project-auth.herokuapp.com/api_uses')
     .then(response =>{
         return response.json();
@@ -27,12 +28,11 @@ router.post("/", (request, response) => {
     .then(data =>{
         keys = JSON.stringify(api_keys.keys[data.message])
         split = keys.split('\"')
-    fetch('https://api.weatherbit.io/v2.0/forecast/daily?city='+city+'&key=' + split[3])
+    fetch('https://api.weatherbit.io/v2.0/forecast/daily?lat='+lat+'&lon='+long+'&key=' + split[3])
         .then(response =>{
             return response.json();
         })
         .then(data =>{
-
             const payload = {
                 "days" : [
                     {

@@ -25,8 +25,17 @@ app.use('/auth', require('./routes/signin.js'))
 app.use('/auth', require('./routes/register.js'))
 
 app.use('/weather',require('./utilities/weather.js'))
+app.use('/weather_hourly',require('./utilities/weather_hourly.js'))
+//app.use('/verify',require('./utilities/email'))
 app.use('/weather_current',require('./utilities/weather_current.js'))
 app.use('/api_uses',require('./utilities/api_uses.js'))
+
+app.use('/phish', middleware.checkToken, require('./routes/phish.js')) 
+
+app.use('/messages', middleware.checkToken, require('./routes/messages.js'))
+app.use('/chats', middleware.checkToken, require('./routes/chats.js')) 
+app.use('/auth', middleware.checkToken, require('./routes/pushyregister.js'))
+
 
 
 /*

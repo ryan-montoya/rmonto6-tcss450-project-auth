@@ -3,7 +3,6 @@ const express = require('express')
 
 //retrieve the router object from express
 var router = express.Router()
-
 const api_keys = {
     keys : [{
         key1: "0262b79849e84a35866dc2600904ecd3"
@@ -18,9 +17,10 @@ const api_keys = {
         key4: "61a3155487884405a26387bc46edd87f"
     }
 ]}
-router.post("/", (request, response) => {
-    const city = request.body.city;
 
+router.post("/", (request, response) => {
+    const lat = request.body.lat;
+    const long = request.body.long;
     fetch('https://rmonto6-tcss450-project-auth.herokuapp.com/api_uses')
     .then(response =>{
         return response.json();
@@ -28,20 +28,23 @@ router.post("/", (request, response) => {
     .then(data =>{
         keys = JSON.stringify(api_keys.keys[data.message])
         split = keys.split('\"')
-    fetch('https://api.weatherbit.io/v2.0/forecast/daily?city='+city+'&key=' + split[3])
-    .then(response =>{
-        return response.json();
+    fetch('https://api.weatherbit.io/v2.0/current?lat='+lat+'&lon='+long+'&key=' + split[3])
+        .then(response =>{
+            return response.json();
+        })
+        .then(data =>{
+            const payload = {
+                temp: data.data[0].temp,
+                clouds: data.data[0].clouds,
+                aqi: data.data[0].aqi,
+                weather: data.data[0].weather.description
+            }
+            
+            response.send({
+                //req.query is a reference to arguments a
+                message: payload
+            })
     })
-    .then(data =>{
-        console.log(data.data[0].valid_date)
-    fetch('http://api.weatherbit.io/v2.0/history/hourly?city='+city + '&start_date=' + data.data[0].valid_date + "&end_date=" + data.data[0].valid_date +'&key=' + split[3])
-    .then(response =>{
-        return response.json();
-    })
-    .then(data =>{
-        console.log(data)
-})
-})
 })
 })
 
