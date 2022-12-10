@@ -9,8 +9,8 @@ const REFRESH_TOKEN = '1//04IX233oN_Lb4CgYIARAAGAQSNwF-L9IrXzBQdkRw-BlrwzTqtLdB5
 const oAuth2Clien  = new google.auth.OAuth2(CLIENT_ID,CLIENT_SECRET, REDIRECT_URI)
 oAuth2Clien.setCredentials({ refresh_token: REFRESH_TOKEN })
 
-const FROM = 'Group7_TCSS450_admin @ <smalltalktcss@gmail.com>'
-const TOEMAIL = 'smalltalktcss@gmail.com'
+const FROM = 'Group7_TCSS450_admin @ <emailfortrialcoding@gmail.com>'
+const TOEMAIL = 'nickungdung@gmail.com'
 const SUBJECT = 'Example to send email through API gmail'
 const BODY = ' information need to send in email '
 
@@ -52,4 +52,3 @@ async function sendMail(){
 sendMail()
     .then((result) => console.log('email send ....', result))
     .catch( (error) => console.log(error.message) );
-
