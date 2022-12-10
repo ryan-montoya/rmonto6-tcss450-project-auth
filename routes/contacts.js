@@ -196,4 +196,74 @@ router.get("/", (request, response, next) => {
         })
 })
 
+router.delete("/", (request, response, next) => {
+  
+    const username_A = request.body.username_A
+    const username_B = request.body.username_B
+    let query = `SELECT * FROM contacts
+                WHERE (MemberID_A = (SELECT members.MemberID
+                                    FROM members
+                                    where members.Username = $1) 
+                        AND MemberID_B = (SELECT members.MemberID
+                                        FROM members
+                                        where members.Username = $2)) 
+                        OR (MemberID_A = (SELECT members.MemberID
+                                        FROM members
+                                        where members.Username = $2) 
+                        AND MemberID_B = (SELECT members.MemberID
+                                        FROM members
+                                        where members.Username = $1)) ;`
+    let values = [username_A, username_B]
+
+    pool.query(query, values)
+    .then(result => {
+        if (result.rowCount == 0) {
+            response.send({
+                message: "contact does not exist to delete",
+                //success: true,
+
+            })
+
+        } else {
+            //contact not found so create it
+            next()
+        }
+    }).catch(error => {
+        response.status(400).send({
+            message: "SQL Error",
+            error: error
+        })
+    })                          
+
+}, (request, response) => {
+    const username_A = request.body.username_A
+    const username_B = request.body.username_B
+    let query = `DELETE FROM contacts
+                WHERE (MemberID_A = (SELECT members.MemberID
+                                    FROM members
+                                    where members.Username = $1) 
+                        AND MemberID_B = (SELECT members.MemberID
+                                        FROM members
+                                        where members.Username = $2)) 
+                        OR (MemberID_A = (SELECT members.MemberID
+                                        FROM members
+                                        where members.Username = $2) 
+                        AND MemberID_B = (SELECT members.MemberID
+                                        FROM members
+                                        where members.Username = $1)) ;`
+    let values = [username_A, username_B]
+
+    pool.query(query, values)
+    .then(result => {
+        response.send({
+            success: true
+        })
+    }).catch(err => {
+        response.status(400).send({
+            message: "SQL Error",
+            error: err
+        })
+    })
+})
+
 module.exports = router
