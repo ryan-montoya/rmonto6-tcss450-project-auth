@@ -23,7 +23,7 @@ app.use(middleware.jsonErrorInBody)
 app.use('/auth', require('./routes/signin.js'))
 
 app.use('/auth', require('./routes/register.js'))
-
+app.use('/change',require('./utilities/change_password.js'))
 app.use('/weather',require('./utilities/weather.js'))
 app.use('/weather_hourly',require('./utilities/weather_hourly.js'))
 //app.use('/verify',require('./utilities/email'))
